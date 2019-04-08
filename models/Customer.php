@@ -43,6 +43,7 @@ use Yii;
  */
 class Customer extends \yii\db\ActiveRecord
 {
+    public $password;
     /**
      * {@inheritdoc}
      */
@@ -58,10 +59,10 @@ class Customer extends \yii\db\ActiveRecord
     {
         return [
             [['dob'], 'safe'],
-            [['gender', 'marital_status'], 'required'],
+            [['gender', 'marital_status','password'], 'required'],
             [['gender', 'marital_status'], 'string'],
             [['nationality', 'district', 'thana', 'post', 'religion', 'user_id'], 'integer'],
-            [['name'], 'string', 'max' => 350],
+            [['name','password'], 'string', 'max' => 350],
             [['area', 'road', 'house'], 'string', 'max' => 255],
             [['nationality'], 'exist', 'skipOnError' => true, 'targetClass' => Nationality::className(), 'targetAttribute' => ['nationality' => 'id']],
             [['district'], 'exist', 'skipOnError' => true, 'targetClass' => District::className(), 'targetAttribute' => ['district' => 'id']],
@@ -92,6 +93,7 @@ class Customer extends \yii\db\ActiveRecord
             'religion' => 'Religion',
             'marital_status' => 'Marital Status',
             'user_id' => 'User ID',
+            'password' => 'Pass Word',
         ];
     }
 
@@ -237,5 +239,15 @@ class Customer extends \yii\db\ActiveRecord
     public function getWishListTaggedTos()
     {
         return $this->hasMany(WishListTaggedTo::className(), ['customer_id' => 'id']);
+    }
+    
+    public function getPassword()
+    {
+        return $this->password;
+    }
+    
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 }

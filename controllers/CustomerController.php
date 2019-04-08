@@ -16,44 +16,50 @@ namespace app\controllers;
 use Yii;
 use app\models\Customer;
 use app\models\Users;
-class CustomerController  extends \yii\rest\ActiveController{
-    
-    
+
+class CustomerController extends \yii\rest\ActiveController {
+
     public $enableCsrfValidation = false;
     public $modelClass = 'app\models\Customer';
-    
+
     public function actionGet_all_customer() {
         //echo 'oh no';die;
-        
         //Yii::$app->response->format = yii\web\Response:: FORMAT_JSON;
         $allCustomers = Customer::find()->all();
-        if(count($allCustomers)>0)
+        if (count($allCustomers) > 0) {
+            return array('status' => true, 'data' => $allCustomers);
+        } else {
+            return array('status' => true, 'data' => 'no');
+        }
+    }
+
+    public function actionCreate_customer() {
+        Yii::$app->response->format = yii\web\Response:: FORMAT_JSON;
+
+        $modelCustomer = new Customer();
+        $modelUser = new Users();
+        //print_r(Yii::$app->request->post());die;
+        //echo Yii::$app->request->post()['password']; die;
+        
+        
+        $modelUser->password = Yii::$app->request->post()['password'];
+        $modelUser->username = Yii::$app->request->post()['username'];
+        
+        if($modelUser->validate())
         {
-            return array('status'=>true, 'data'=>$allCustomers);
+            $modelUser->save();
         }
         else
         {
-            return array('status'=>true, 'data'=>'no');
+            return array('response'=>false, 'message'=>'no user details');
         }
-    }
-    
-    public function actionCreate_customer() {
-        Yii::$app->response->format = yii\web\Response:: FORMAT_JSON;
-       // Yii::$app->request->
-        $modelCustomer = new Customer();
-        $modelUser = new Users();
-        //print_r($_POST);die;
-       //print_r(Yii::$app->request->post());die;
-       // $data = Yii::$app->getRequest()->getBodyParams();
-        // print_r($data);die;
-        //$modelCustomer->gender = $data['gender'];
-       $modelCustomer->load(Yii::$app->request->post(),'');
-        //echo $modelCustomer->gender;die;
+        $modelCustomer->user = $modelUser->id;
+        $modelCustomer->load(Yii::$app->request->post(), '');
+        //print_r($modelCustomer->attributes);die;
+        return $modelCustomer;
+
         $modelCustomer->save();
         return $modelCustomer;
-        //print_r(Yii::$app->request->post());die;
-        //if()
-        
     }
-    
+
 }
