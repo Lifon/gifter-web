@@ -33,33 +33,38 @@ class CustomerController extends \yii\rest\ActiveController {
         }
     }
 
+    private function createUser($pass, $user) {
+        $modelUser = new Users();
+        $modelUser->password = $pass;
+        Yii::$app->request->post()['password'];
+        $modelUser->username = $user;
+        ;
+        $modelUser->privilege = 0;
+
+        if ($modelUser->validate()) {
+            $modelUser->save();
+            return $modelUser->id;
+        } else {
+            return false;
+        }
+    }
+
     public function actionCreate_customer() {
         Yii::$app->response->format = yii\web\Response:: FORMAT_JSON;
 
         $modelCustomer = new Customer();
-        $modelUser = new Users();
+
         //print_r(Yii::$app->request->post());die;
         //echo Yii::$app->request->post()['password']; die;
-        
-        
-        $modelUser->password = Yii::$app->request->post()['password'];
-        $modelUser->username = Yii::$app->request->post()['username'];
-        
-        if($modelUser->validate())
-        {
-            $modelUser->save();
+        $user_id = $this->createUser(Yii::$app->request->post()['password'], Yii::$app->request->post()['username']);
+        if ($user_id) {
+            $modelCustomer->user_id = $user_id;
+            $modelCustomer->load(Yii::$app->request->post(), '');
+            $modelCustomer->save();
+            return $modelCustomer;
+        } else {
+            return array('response' => false, 'message' => 'no user details');
         }
-        else
-        {
-            return array('response'=>false, 'message'=>'no user details');
-        }
-        $modelCustomer->user = $modelUser->id;
-        $modelCustomer->load(Yii::$app->request->post(), '');
-        //print_r($modelCustomer->attributes);die;
-        return $modelCustomer;
-
-        $modelCustomer->save();
-        return $modelCustomer;
     }
 
 }

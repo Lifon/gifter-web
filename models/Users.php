@@ -35,7 +35,9 @@ class Users extends \yii\db\ActiveRecord
             [['privilege'], 'integer'],
             [['username', 'password'], 'required'],
             [['username', 'password', 'last_update'], 'string', 'max' => 255],
+            [['username'], 'unique'],
             [['privilege'], 'exist', 'skipOnError' => true, 'targetClass' => Privilege::className(), 'targetAttribute' => ['privilege' => 'id']],
+            
         ];
     }
 
