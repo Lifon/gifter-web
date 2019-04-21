@@ -49,6 +49,16 @@ class CustomerController extends \yii\rest\ActiveController {
         }
     }
 
+    public function actionLogin($user, $pass) {
+        $user = Users::findOne("username = " . $user . " and password = " . $pass);
+        if (isset($user)) {
+            return array('response' => TRUE, 'message' => 'Right User name and pass');
+        } else {
+            return array('response' => FALSE, 'message' => 'Wrong User name and pass');
+
+        }
+    }
+
     public function actionCreate_customer() {
         Yii::$app->response->format = yii\web\Response:: FORMAT_JSON;
 
@@ -60,8 +70,13 @@ class CustomerController extends \yii\rest\ActiveController {
         if ($user_id) {
             $modelCustomer->user_id = $user_id;
             $modelCustomer->load(Yii::$app->request->post(), '');
-            $modelCustomer->save();
-            return $modelCustomer;
+            if ($modelCustomer->validate()) {
+                $modelCustomer->save();
+
+                return $modelCustomer;
+            } else {
+                return array('response' => false, 'message' => 'Wrong account info');
+            }
         } else {
             return array('response' => false, 'message' => 'no user details');
         }
